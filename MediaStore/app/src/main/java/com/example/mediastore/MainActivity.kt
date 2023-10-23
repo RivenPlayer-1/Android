@@ -1,13 +1,12 @@
 package com.example.mediastore
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.opengl.Visibility
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,8 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
@@ -30,19 +28,19 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: ImageAdapter
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding =
             DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
         viewModel = ViewModelProvider(this)[ImageViewModel::class.java]
-        adapter = ImageAdapter(viewModel.images.value?: arrayListOf())
+        adapter = ImageAdapter(viewModel.images.value ?: arrayListOf())
         binding.recyclerView.adapter = adapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(applicationContext)
+        binding.recyclerView.layoutManager = GridLayoutManager(applicationContext, 3)
         binding.lifecycleOwner = this
-        if (haveStoragePermission()) {
-//            binding.button.visibility = View.GONE
-
+        viewModel.images.observe(this) {
+            Log.d("TAG", "onCreate: updateAdapter")
+            adapter.updateDate(viewModel.images.value ?: arrayListOf())
+            adapter.notifyDataSetChanged()
         }
         binding.button.setOnClickListener {
             openMediaStore()
@@ -133,7 +131,12 @@ class MainActivity : AppCompatActivity() {
 
 }
 
-class ImageAdapter(val data: List<MediaStoreImage>) : RecyclerView.Adapter<ImageViewHolder>() {
+class ImageAdapter(var data: List<MediaStoreImage>) : RecyclerView.Adapter<ImageViewHolder>() {
+
+    fun updateDate(data: List<MediaStoreImage>) {
+        this.data = data
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.gallery_layout, parent, false)
@@ -142,6 +145,9 @@ class ImageAdapter(val data: List<MediaStoreImage>) : RecyclerView.Adapter<Image
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         val mediaStoreImage = data[position]
+        holder.itemView.setOnClickListener {
+
+        }
         Glide.with(holder.itemView)
             .load(mediaStoreImage.contentUri)
             .centerCrop()
@@ -150,7 +156,7 @@ class ImageAdapter(val data: List<MediaStoreImage>) : RecyclerView.Adapter<Image
     }
 
     override fun getItemCount(): Int {
-       return data.size
+        return data.size
     }
 
 }
