@@ -29,13 +29,20 @@ data class MediaStoreImage(
     val dateAdded: Date,
     val contentUri: Uri
 ) {
-    companion object {
-        val DiffCallback = object : DiffUtil.ItemCallback<MediaStoreImage>() {
-            override fun areItemsTheSame(oldItem: MediaStoreImage, newItem: MediaStoreImage) =
-                oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: MediaStoreImage, newItem: MediaStoreImage) =
-                oldItem == newItem
+
+    companion object{
+        val diffCallBack = object : DiffUtil.ItemCallback<MediaStoreImage>(){
+            override fun areItemsTheSame(
+                oldItem: MediaStoreImage,
+                newItem: MediaStoreImage
+            ): Boolean = oldItem == newItem
+
+            override fun areContentsTheSame(
+                oldItem: MediaStoreImage,
+                newItem: MediaStoreImage
+            ): Boolean = oldItem.id == newItem.id
+
         }
     }
 }

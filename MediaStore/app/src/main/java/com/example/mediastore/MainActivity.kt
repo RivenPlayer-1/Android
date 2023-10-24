@@ -1,6 +1,7 @@
 package com.example.mediastore
 
 import android.Manifest
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -10,16 +11,20 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.example.mediastore.databinding.ActivityMainBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 private const val READ_EXTERNAL_STORAGE_REQUEST = 0x1045
 
@@ -33,14 +38,33 @@ class MainActivity : AppCompatActivity() {
         val binding =
             DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
         viewModel = ViewModelProvider(this)[ImageViewModel::class.java]
-        adapter = ImageAdapter(viewModel.images.value ?: arrayListOf())
+        adapter = ImageAdapter {
+
+            deleteImage(it)
+        }
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = GridLayoutManager(applicationContext, 3)
         binding.lifecycleOwner = this
         viewModel.images.observe(this) {
             Log.d("TAG", "onCreate: updateAdapter")
-            adapter.updateDate(viewModel.images.value ?: arrayListOf())
-            adapter.notifyDataSetChanged()
+//            adapter.updateDate(viewModel.images.value ?: arrayListOf())
+            adapter.submitList(it)
+        }
+
+        val result =
+            registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
+                if (it.resultCode == RESULT_OK) {
+                    viewModel.deletePendingImage()
+                }
+            }
+
+        viewModel.permissionNeededForDelete.observe(this) { intentSender ->
+            intentSender?.let {
+                Log.d("TAG", "onCreate: print $it")
+                val request = IntentSenderRequest.Builder(it).build()
+                result.launch(request)
+
+            }
         }
         binding.button.setOnClickListener {
             openMediaStore()
@@ -59,6 +83,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun showImages() {
         viewModel.loadImages()
+    }
+
+    private fun deleteImage(image: MediaStoreImage) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("删除图片")
+            .setMessage(image.displayName)
+            .setPositiveButton("确认") { _: DialogInterface, _: Int ->
+                viewModel.deleteImage(image)
+            }
+            .setNegativeButton("取消") { dialog: DialogInterface, _: Int ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun haveStoragePermission() =
@@ -96,16 +133,6 @@ class MainActivity : AppCompatActivity() {
                             this,
                             Manifest.permission.READ_EXTERNAL_STORAGE
                         )
-
-                    /**
-                     * If we should show the rationale for requesting storage permission, then
-                     * we'll show [ActivityMainBinding.permissionRationaleView] which does this.
-                     *
-                     * If `showRationale` is false, this means the user has not only denied
-                     * the permission, but they've clicked "Don't ask again". In this case
-                     * we send the user to the settings page for the app so they can grant
-                     * the permission (Yay!) or uninstall the app.
-                     */
                     if (showRationale) {
 //                        showNoAccess()
                     } else {
@@ -131,23 +158,18 @@ class MainActivity : AppCompatActivity() {
 
 }
 
-class ImageAdapter(var data: List<MediaStoreImage>) : RecyclerView.Adapter<ImageViewHolder>() {
-
-    fun updateDate(data: List<MediaStoreImage>) {
-        this.data = data
-    }
+class ImageAdapter(private val onClick: (MediaStoreImage) -> Unit) :
+    ListAdapter<MediaStoreImage, ImageViewHolder>(MediaStoreImage.diffCallBack) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.gallery_layout, parent, false)
-        return ImageViewHolder(view)
+        return ImageViewHolder(view, onClick)
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        val mediaStoreImage = data[position]
-        holder.itemView.setOnClickListener {
-
-        }
+        val mediaStoreImage = getItem(position)
+        holder.itemView.tag = mediaStoreImage
         Glide.with(holder.itemView)
             .load(mediaStoreImage.contentUri)
             .centerCrop()
@@ -155,14 +177,20 @@ class ImageAdapter(var data: List<MediaStoreImage>) : RecyclerView.Adapter<Image
 
     }
 
-    override fun getItemCount(): Int {
-        return data.size
-    }
 
 }
 
-class ImageViewHolder(view: View) : ViewHolder(view) {
+class ImageViewHolder(view: View, onClick: (MediaStoreImage) -> Unit) : ViewHolder(view) {
+    private val imageView: ImageView
 
+    init {
+        imageView = view.findViewById(R.id.image)
+        imageView.setOnClickListener {
+            val image = view.tag as? MediaStoreImage ?: return@setOnClickListener
+            onClick(image)
+
+        }
+    }
 }
 
 //class ImageAdapter(private val data: List<String>) : RecyclerView.Adapter<ImageViewHolder>() {
