@@ -17,9 +17,13 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.mediastore.entity.Vertical
+import com.example.mediastore.net.MainService
+import com.example.mediastore.net.NetConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.awaitResponse
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -30,15 +34,14 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
 
 
     private val _images = MutableLiveData<List<MediaStoreImage>>()
+    private val _netImages = MutableLiveData<List<Vertical>>()
     val images: LiveData<List<MediaStoreImage>> get() = _images
+    val netImage: LiveData<List<Vertical>> get() = _netImages
 
     private var pendingDeleteImage: MediaStoreImage? = null
     private val _permissionNeededForDelete = MutableLiveData<IntentSender?>()
     val permissionNeededForDelete get() = _permissionNeededForDelete
     private var contentObserver: ContentObserver? = null
-
-
-
 
 
     fun loadImages() {
@@ -164,10 +167,26 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
             pendingDeleteImage = null
         }
     }
+
+    fun loadImage() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val response =
+                    NetConfig.getService(MainService::class.java).getImage().awaitResponse().body()
+                if (response != null) {
+                    _netImages.postValue(response.res.vertical)
+                }
+
+            }
+        }
+    }
 }
 
-private fun ContentResolver.registerObserver(uri: Uri, observer:(selfChange: Boolean) -> Unit): ContentObserver {
-    val contentObserver = object: ContentObserver(Looper.myLooper()?.let { Handler(it) }){
+private fun ContentResolver.registerObserver(
+    uri: Uri,
+    observer: (selfChange: Boolean) -> Unit
+): ContentObserver {
+    val contentObserver = object : ContentObserver(Looper.myLooper()?.let { Handler(it) }) {
         override fun onChange(selfChange: Boolean) {
             observer(selfChange)
         }

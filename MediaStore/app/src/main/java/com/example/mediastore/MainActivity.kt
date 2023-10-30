@@ -50,6 +50,13 @@ class MainActivity : AppCompatActivity() {
 //            adapter.updateDate(viewModel.images.value ?: arrayListOf())
             adapter.submitList(it)
         }
+        viewModel.netImage.observe(this){
+            Glide.with(binding.root)
+                .load(it[2].preview)
+                .centerCrop()
+                .into(binding.netImageView)
+        }
+        viewModel.loadImage()
 
         val result =
             registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
