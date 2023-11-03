@@ -24,6 +24,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.example.mediastore.databinding.ActivityMainBinding
+import com.example.mediastore.entity.MediaStoreImage
+import com.example.mediastore.ui.MusicActivity
+import com.example.mediastore.ui.ServiceActivity
+import com.example.mediastore.view_model.ImageViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 private const val READ_EXTERNAL_STORAGE_REQUEST = 0x1045
@@ -39,18 +43,27 @@ class MainActivity : AppCompatActivity() {
             DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
         viewModel = ViewModelProvider(this)[ImageViewModel::class.java]
         adapter = ImageAdapter {
-
             deleteImage(it)
         }
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = GridLayoutManager(applicationContext, 3)
         binding.lifecycleOwner = this
+        binding.button.setOnClickListener {
+            openMediaStore()
+        }
+        binding.buttonToService.setOnClickListener {
+            startActivity(Intent(this, ServiceActivity::class.java))
+        }
+        binding.buttonToMusic.setOnClickListener{
+            startActivity(Intent(this, MusicActivity::class.java))
+        }
+
+
         viewModel.images.observe(this) {
             Log.d("TAG", "onCreate: updateAdapter")
-//            adapter.updateDate(viewModel.images.value ?: arrayListOf())
             adapter.submitList(it)
         }
-        viewModel.netImage.observe(this){
+        viewModel.netImage.observe(this) {
             Glide.with(binding.root)
                 .load(it[2].preview)
                 .centerCrop()
@@ -73,9 +86,7 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
-        binding.button.setOnClickListener {
-            openMediaStore()
-        }
+
 
     }
 

@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.example.mediastore.ImageViewModel" />
+            type="com.example.mediastore.view_model.ImageViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,6 +25,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_to_service"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="jump to service"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/button" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
@@ -41,6 +50,15 @@
             app:layout_constraintTop_toBottomOf="@id/button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+        <Button
+            android:id="@+id/buttonToMusic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="jump to music"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/button_to_service" />
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
