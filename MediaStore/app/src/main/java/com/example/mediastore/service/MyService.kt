@@ -1,5 +1,6 @@
 package com.example.mediastore.service
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -40,6 +41,7 @@ class MyService : Service() {
     }
 
 
+    @SuppressLint("RemoteViewLayout")
     override fun onCreate() {
         super.onCreate() // 调用父类的onCreate方法
         Log.d(TAG, "onCreate: ") // 打印日志信息

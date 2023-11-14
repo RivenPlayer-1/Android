@@ -26,6 +26,7 @@ import com.bumptech.glide.Glide
 import com.example.mediastore.databinding.ActivityMainBinding
 import com.example.mediastore.entity.MediaStoreImage
 import com.example.mediastore.ui.MusicActivity
+import com.example.mediastore.ui.NotificationActivity
 import com.example.mediastore.ui.ServiceActivity
 import com.example.mediastore.view_model.ImageViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -56,6 +57,10 @@ class MainActivity : AppCompatActivity() {
         }
         binding.buttonToMusic.setOnClickListener{
             startActivity(Intent(this, MusicActivity::class.java))
+        }
+
+        binding.buttonToNotification.setOnClickListener{
+            startActivity(Intent(this, NotificationActivity::class.java))
         }
 
 
