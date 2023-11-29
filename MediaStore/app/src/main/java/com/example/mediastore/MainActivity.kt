@@ -28,6 +28,7 @@ import com.example.mediastore.entity.MediaStoreImage
 import com.example.mediastore.ui.MusicActivity
 import com.example.mediastore.ui.NotificationActivity
 import com.example.mediastore.ui.ServiceActivity
+import com.example.mediastore.ui.ViewPagerActivity
 import com.example.mediastore.view_model.ImageViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -55,12 +56,15 @@ class MainActivity : AppCompatActivity() {
         binding.buttonToService.setOnClickListener {
             startActivity(Intent(this, ServiceActivity::class.java))
         }
-        binding.buttonToMusic.setOnClickListener{
+        binding.buttonToMusic.setOnClickListener {
             startActivity(Intent(this, MusicActivity::class.java))
         }
 
-        binding.buttonToNotification.setOnClickListener{
+        binding.buttonToNotification.setOnClickListener {
             startActivity(Intent(this, NotificationActivity::class.java))
+        }
+        binding.buttonToViewPager.setOnClickListener {
+            startActivity(Intent(this, ViewPagerActivity::class.java))
         }
 
 
