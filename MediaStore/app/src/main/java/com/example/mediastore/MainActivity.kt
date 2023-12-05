@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.example.mediastore.databinding.ActivityMainBinding
+import com.example.mediastore.demo.CoroutinesActivity
 import com.example.mediastore.entity.MediaStoreImage
 import com.example.mediastore.ui.MusicActivity
 import com.example.mediastore.ui.NotificationActivity
@@ -65,6 +66,9 @@ class MainActivity : AppCompatActivity() {
         }
         binding.buttonToViewPager.setOnClickListener {
             startActivity(Intent(this, ViewPagerActivity::class.java))
+        }
+        binding.buttonToCoroutines.setOnClickListener {
+            startActivity(Intent(this, CoroutinesActivity::class.java))
         }
 
 
