@@ -1,23 +1,29 @@
 package com.example.customview
 
+import android.animation.Animator
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.app.Activity
 import android.graphics.Color
+import android.graphics.PixelFormat
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 import android.util.Log
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
+import android.view.animation.Animation
+import android.view.animation.AnimationSet
 import android.widget.Button
 import android.widget.LinearLayout
-import android.widget.PopupWindow
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.customview.popupwindow.CustomPopupWindow
+import com.example.customview.views.FirstDayPra
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -33,11 +39,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         windowManager = this.getSystemService(Activity.WINDOW_SERVICE) as WindowManager
         val button = view.findViewById<View>(R.id.bt_main) as Button
         val button2 = view.findViewById<View>(R.id.bt_second) as Button
-        val button3 = view.findViewById<View>(R.id.bt_popup) as Button
         button.setOnClickListener(this)
         button2.setOnClickListener(this)
-        button3.setOnClickListener(this)
         setContentView(view)
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed({addView()},1000)
     }
 
     override fun onClick(v: View?) {
@@ -45,22 +51,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             R.id.bt_main -> {
                 val handlerThread = HandlerThread("aaaa")
                 handlerThread.start()
-                val handler = Handler(handlerThread.looper)
+                val handler = Handler(Looper.getMainLooper())
                 handler.postDelayed({
 //                    textView.text = "B"
                     addView()
 
-                }, 2000)
+                }, 0)
             }
 
             R.id.bt_second -> {
                 val handler = Handler(Looper.getMainLooper())
-                handler.postDelayed({ addView2() }, 2000)
+                handler.postDelayed({ addView2() }, 0)
             }
 
-            R.id.bt_popup -> {
-                addPopupWindow()
-            }
         }
     }
 
@@ -72,17 +75,27 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
      * 4、向WindowManger添加ViewGroup和GroupParams
      */
     private fun addView() {
-//        (view as LinearLayout).addView(textView)
         linearLayout = LinearLayout(this)
-        val textView2 = TextView(this).apply {
-            text = "AA"
+        val circleView = FirstDayPra(this)
+        val textView = TextView(this).apply {
+            text = "bb"
             setTextColor(Color.RED)
         }
         val rootParams =
-            WindowManager.LayoutParams(WindowManager.LayoutParams.TYPE_APPLICATION)
-        rootParams.width = 300
-        rootParams.height = 300
-        windowManager.addView(textView2, rootParams)
+            WindowManager.LayoutParams(WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL).apply {
+                width = ViewGroup.LayoutParams.MATCH_PARENT
+                height = ViewGroup.LayoutParams.MATCH_PARENT
+                flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                        WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM or
+                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                format = PixelFormat.RGBA_8888
+            }
+        linearLayout.setBackgroundColor(Color.WHITE)
+
+        linearLayout.addView(textView)
+        linearLayout.addView(circleView)
+        windowManager.addView(linearLayout, rootParams)
 
     }
 
@@ -90,43 +103,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         val textView2 = TextView(this)
         textView2.text = "AA"
         textView2.setTextColor(Color.RED)
+        Toast.makeText(this, "AA", Toast.LENGTH_SHORT)
+        Log.d(TAG, "addView2: aaaa")
         linearLayout.addView(textView2)
     }
 
-    private fun addPopupWindow() {
-        val view = LayoutInflater.from(this).inflate(R.layout.popwindo, null)
-
-        view.setOnKeyListener(object : View.OnKeyListener {
-            override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
-                Log.d(TAG, "onKey: aaaaaaa")
-                return true
-            }
-        })
-
-        val popupWindow = CustomPopupWindow(view, 1000, 300).apply {
-            isFocusable = true
-            isOutsideTouchable = true
-            setOnDismissListener {
-                PopupWindow.OnDismissListener {
-                    Log.d(
-                        TAG,
-                        "dismiss: "
-                    )
-                }
-            }
-        }
-//        popupWindow.setOnBackPressListener(object : CustomPopupWindow.OnBackPressListener {
-//            override fun onBack() {
-//                Log.d(TAG, "onBack: aaa")
-//            }
-//        })
-
-//        val myDecoderView = PopupWindow::class.java.getDeclaredMethod("PopupDecorView")
-//        myDecoderView.isAccessible = true
-//        Toast.makeText(this, myDecoderView.getAnnotation(), Toast.LENGTH_SHORT)
-
-        popupWindow.showAsDropDown(view, 0, 0)
-    }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         return super.dispatchTouchEvent(ev)

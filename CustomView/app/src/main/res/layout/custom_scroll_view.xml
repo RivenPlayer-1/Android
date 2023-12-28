@@ -7,7 +7,27 @@
         android:id="@+id/custom_scroll_view1"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:background="@color/black"
-        />
+        android:background="@color/black" />
 
+    <TextView
+        android:id="@+id/tv_main"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="A"
+        android:textSize="30sp" />
+
+
+    <Button
+        android:id="@+id/bt_main"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Test"
+        android:textSize="30dp" />
+
+    <Button
+        android:id="@+id/bt_second"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="B"
+        android:textSize="30sp" />
 </LinearLayout>
