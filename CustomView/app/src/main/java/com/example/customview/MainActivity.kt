@@ -1,7 +1,5 @@
 package com.example.customview
 
-import android.animation.Animator
-import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.app.Activity
 import android.graphics.Color
@@ -16,8 +14,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.view.animation.Animation
-import android.view.animation.AnimationSet
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -43,7 +39,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         button2.setOnClickListener(this)
         setContentView(view)
         val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({addView()},1000)
+        handler.postDelayed({ addView() }, 1000)
     }
 
     override fun onClick(v: View?) {
@@ -77,23 +73,44 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private fun addView() {
         linearLayout = LinearLayout(this)
         val circleView = FirstDayPra(this)
+//        val objectAnimator1 = ObjectAnimator.ofFloat(circleView, "x", 0f, 100f).apply { duration = 3000 }
+//        val objectAnimator = ObjectAnimator.ofFloat(circleView,"rotation",90f)
+//        val objectAnimator2 = ObjectAnimator.ofFloat(circleView, "y", 0f, 1000f).apply { duration = 3000 }
+//        val objectAnimator3 = ObjectAnimator.ofFloat(circleView, "x", 100f, 0f).apply { duration = 3000 }
+//        val objectAnimator4 = ObjectAnimator.ofFloat(circleView, "y", 1000f, 0f).apply { duration = 3000
+//        start()
+//        }
+        val objectAnimator = ObjectAnimator.ofInt(circleView, "process", 0, 88).apply {
+            duration = 3000
+        }
+        val button = Button(this).apply {
+            text = "animator"
+            setOnClickListener {
+                objectAnimator.start()
+            }
+        }
+
+//        animationSet.play(objectAnimator)
+//        animationSet.start()
         val textView = TextView(this).apply {
             text = "bb"
             setTextColor(Color.RED)
         }
         val rootParams =
-            WindowManager.LayoutParams(WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL).apply {
-                width = ViewGroup.LayoutParams.MATCH_PARENT
-                height = ViewGroup.LayoutParams.MATCH_PARENT
-                flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                        WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM or
-                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                format = PixelFormat.RGBA_8888
-            }
+            WindowManager.LayoutParams(WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL)
+                .apply {
+                    width = ViewGroup.LayoutParams.MATCH_PARENT
+                    height = ViewGroup.LayoutParams.MATCH_PARENT
+                    flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                            WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM or
+                            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                    format = PixelFormat.RGBA_8888
+                }
         linearLayout.setBackgroundColor(Color.WHITE)
 
         linearLayout.addView(textView)
+        linearLayout.addView(button)
         linearLayout.addView(circleView)
         windowManager.addView(linearLayout, rootParams)
 
