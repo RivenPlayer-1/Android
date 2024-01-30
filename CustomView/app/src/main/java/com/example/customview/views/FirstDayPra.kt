@@ -59,16 +59,16 @@ class FirstDayPra(context: Context) : View(context) {
         paint.textSize = 84f;
         canvas.drawText(text, 100f, 240f, paint)
 
-        paint.setShader(linerShader)
+        paint.shader = linerShader
         canvas.drawCircle(100f, 500f, 100f, paint)
 
         canvas.save()
-        paint.setShader(bitShader)
+        paint.shader = bitShader
 //        canvas.clipRect(100f,700f,150f,750f)
         canvas.rotate(45f, 150f, 750f)
         canvas.drawRect(0f, 400f, 200f, 600f, paint)
         canvas.restore()
-        paint.setShader(bitShader2)
+        paint.shader = bitShader2
         canvas.drawCircle(100f, 900f, 100f, paint)
 
         canvas.drawLine(500f, 500f, 800f, 800f, paint)
